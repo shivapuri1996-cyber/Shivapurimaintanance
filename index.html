@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shivapuri Maintenance</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --card: rgba(255,255,255,0.85);
+      --text: #1d1d1f;
+      --accent: #007aff;
+      --danger: #ff3b30;
+      --border: rgba(0,0,0,0.08);
+      --search-bg: rgba(255,255,255,0.7);
+      --success: #34c759;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; }
+    .container { max-width: 720px; margin: 0 auto; padding: 15px; }
+    h1 { font-size: 2.2rem; font-weight: 700; text-align: center; padding: 40px 0 25px; }
+    .nav-tabs { background: var(--card); backdrop-filter: blur(24px); border-radius: 18px; border: 1px solid var(--border); padding: 6px; }
+    .nav-link { border-radius: 12px; font-weight: 600; }
+    .tab-content { background: var(--card); backdrop-filter: blur(24px); border-radius: 18px; border: 1px solid var(--border); padding: 20px; margin: 15px 0 30px; }
+    .search-container { position: relative; margin-bottom: 1.2rem; }
+    .search-input { width: 100%; padding: 12px 16px 12px 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--search-bg); backdrop-filter: blur(10px); font-size: 16px; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text); opacity: 0.6; font-size: 1.2rem; }
+    .btn-primary { background: var(--accent); border: none; border-radius: 12px; }
+    .btn-danger { background: var(--danger); border: none; border-radius: 10px; padding: 5px 10px; font-size: 0.9rem; }
+    .btn-success { background: var(--success); border: none; }
+    .table-responsive { border-radius: 12px; overflow: hidden; }
+    .table { --bs-table-bg: transparent; }
+    .table th { color: #6e6e73; font-weight: 600; border-bottom: 1px solid var(--border); }
+    .totals { background: rgba(0,122,255,0.08); border-radius: 12px; padding: 14px; margin-top: 20px; text-align: center; font-weight: 600; }
+
+    .thank-you-modal .modal-content { text-align: center; padding: 2rem; }
+    .thank-you-modal .success-icon { font-size: 4.5rem; color: var(--success); margin-bottom: 1rem; }
+    .thank-you-modal .thank-title { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }
+    .thank-you-modal .thank-details { font-size: 1.2rem; margin: 0.6rem 0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Shivapuri Maintenance</h1>
+
+  <ul class="nav nav-tabs justify-content-center mb-3" id="myTab" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#individual">Individual</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#apartment">Apartment</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#others">Others</button></li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- INDIVIDUAL -->
+    <div class="tab-pane fade show active" id="individual">
+      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#indModal">+ Add Entry</button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" onclick="captureScreenshot('individual')">Screenshot</button>
+          <button class="btn btn-outline-success btn-sm" onclick="exportExcel('individual')">Excel</button>
+        </div>
+      </div>
+      <div class="search-container"><span class="search-icon">🔍</span><input type="text" class="search-input" id="ind-search" placeholder="Search..."></div>
+      <select class="form-select mb-3" id="ind-filter" onchange="renderTable('individual')"><option value="">All Months</option></select>
+      <div class="table-responsive"><table class="table table-hover"><thead><tr><th>#</th><th>Date</th><th>Plot</th><th>Name</th><th>Amount</th><th>Mode</th><th>Remarks</th><th></th></tr></thead><tbody id="individual-tbody"></tbody></table></div>
+      <div class="totals" id="individual-totals"></div>
+    </div>
+
+    <!-- APARTMENT -->
+    <div class="tab-pane fade" id="apartment">
+      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aptModal">+ Add Entry</button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" onclick="captureScreenshot('apartment')">Screenshot</button>
+          <button class="btn btn-outline-success btn-sm" onclick="exportExcel('apartment')">Excel</button>
+        </div>
+      </div>
+      <div class="search-container"><span class="search-icon">🔍</span><input type="text" class="search-input" id="apt-search" placeholder="Search..."></div>
+      <select class="form-select mb-3" id="apt-filter" onchange="renderTable('apartment')"><option value="">All Months</option></select>
+      <div class="table-responsive"><table class="table table-hover"><thead><tr><th>#</th><th>Date</th><th>Plot</th><th>Flat</th><th>Name</th><th>Amount</th><th>Mode</th><th>Remarks</th><th></th></tr></thead><tbody id="apartment-tbody"></tbody></table></div>
+      <div class="totals" id="apartment-totals"></div>
+    </div>
+
+    <!-- OTHERS -->
+    <div class="tab-pane fade" id="others">
+      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#othModal">+ Add Entry</button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary btn-sm" onclick="captureScreenshot('others')">Screenshot</button>
+          <button class="btn btn-outline-success btn-sm" onclick="exportExcel('others')">Excel</button>
+        </div>
+      </div>
+      <div class="search-container"><span class="search-icon">🔍</span><input type="text" class="search-input" id="oth-search" placeholder="Search..."></div>
+      <select class="form-select mb-3" id="oth-filter" onchange="renderTable('others')"><option value="">All Months</option></select>
+      <div class="table-responsive"><table class="table table-hover"><thead><tr><th>#</th><th>Date</th><th>Particulars</th><th>Qty</th><th>Amount</th><th>Type</th><th>Remarks</th><th></th></tr></thead><tbody id="others-tbody"></tbody></table></div>
+      <div class="totals" id="others-totals"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals (unchanged) -->
+<div class="modal fade" id="indModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5>New Individual Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <form id="indForm">
+      <div class="mb-3"><label>Plot Number</label><input type="number" class="form-control" id="i-plot" required></div>
+      <div class="mb-3"><label>Name</label><input type="text" class="form-control" id="i-name" required></div>
+      <div class="mb-3"><label>Amount</label><input type="number" class="form-control" id="i-amount" required min="1"></div>
+      <div class="mb-3"><label>Payment Mode</label><select class="form-select" id="i-mode" required><option value="cash">Cash</option><option value="online">Online</option></select></div>
+      <div class="mb-3"><label>Remarks</label><textarea class="form-control" id="i-remarks"></textarea></div>
+      <button type="submit" class="btn btn-primary w-100">Save</button>
+    </form>
+  </div>
+</div></div></div>
+
+<div class="modal fade" id="aptModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5>New Apartment Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <form id="aptForm">
+      <div class="mb-3"><label>Plot Number</label><input type="number" class="form-control" id="a-plot" required></div>
+      <div class="mb-3"><label>Flat Number</label><input type="number" class="form-control" id="a-flat" required></div>
+      <div class="mb-3"><label>Name</label><input type="text" class="form-control" id="a-name" required></div>
+      <div class="mb-3"><label>Amount</label><input type="number" class="form-control" id="a-amount" required min="1"></div>
+      <div class="mb-3"><label>Payment Mode</label><select class="form-select" id="a-mode" required><option value="cash">Cash</option><option value="online">Online</option></select></div>
+      <div class="mb-3"><label>Remarks</label><textarea class="form-control" id="a-remarks"></textarea></div>
+      <button type="submit" class="btn btn-primary w-100">Save</button>
+    </form>
+  </div>
+</div></div></div>
+
+<div class="modal fade" id="othModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+  <div class="modal-header"><h5>New Others Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <form id="othForm">
+      <div class="mb-3"><label>Particulars</label><input type="text" class="form-control" id="o-particulars" required></div>
+      <div class="mb-3"><label>Quantity</label><input type="number" class="form-control" id="o-qty" required></div>
+      <div class="mb-3"><label>Amount</label><input type="number" class="form-control" id="o-amount" required min="1"></div>
+      <div class="mb-3"><label>Type</label><select class="form-select" id="o-type" required><option value="income">Income</option><option value="expenses">Expenses</option></select></div>
+      <div class="mb-3"><label>Remarks</label><textarea class="form-control" id="o-remarks"></textarea></div>
+      <button type="submit" class="btn btn-primary w-100">Save</button>
+    </form>
+  </div>
+</div></div></div>
+
+<!-- Confirmation & Thank You Modals (unchanged) -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white"><h5 class="modal-title">Shivapuri Confirmation</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="confirmBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success" id="confirmSaveBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade thank-you-modal" id="thankModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="success-icon">✓</div>
+        <div class="thank-title">Payment Successful!</div>
+        <div class="thank-details" id="thankDetails"></div>
+        <div class="thank-details mt-3" style="color:var(--success);font-weight:bold;">Received for Shivapuri Maintenance</div>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+// ────────────────────────────────────────────────
+// STORAGE & UTILITIES (unchanged)
+// ────────────────────────────────────────────────
+const STORAGE = {
+  individual: 'shivapuri_individual',
+  apartment: 'shivapuri_apartment',
+  others: 'shivapuri_others'
+};
+
+function getData(cat) { return JSON.parse(localStorage.getItem(STORAGE[cat]) || '[]'); }
+function saveData(cat, data) { localStorage.setItem(STORAGE[cat], JSON.stringify(data)); }
+function formatDate() { return new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}); }
+
+// ────────────────────────────────────────────────
+// RENDER & TOTALS (unchanged)
+// ────────────────────────────────────────────────
+function renderTable(cat) {
+  const data = getData(cat);
+  const tbody = document.getElementById(cat + '-tbody');
+  tbody.innerHTML = '';
+
+  data.forEach((item, i) => {
+    const tr = document.createElement('tr');
+    let html = `<td>${i+1}</td><td>${item.date}</td>`;
+
+    if (cat === 'individual') {
+      html += `<td>${item.plot || '-'}</td><td>${item.name || '-'}</td>`;
+    } else if (cat === 'apartment') {
+      html += `<td>${item.plot || '-'}</td><td>${item.flat || '-'}</td><td>${item.name || '-'}</td>`;
+    } else {
+      html += `<td>${item.particulars || '-'}</td><td>${item.qty || '-'}</td>`;
+    }
+
+    html += `<td>₹${item.amount || 0}</td>`;
+
+    if (cat === 'others') {
+      html += `<td>${item.type || '-'}</td>`;
+    } else {
+      html += `<td>${item.mode || '-'}</td>`;
+    }
+
+    html += `<td>${item.remarks || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="askDelete('${cat}', ${i})">×</button></td>`;
+
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+
+  updateTotals(cat, data);
+}
+
+function updateTotals(cat, data) {
+  const el = document.getElementById(cat + '-totals');
+  let text = 'Total: ₹0';
+
+  if (cat === 'individual' || cat === 'apartment') {
+    const cash = data.reduce((s, e) => s + (e.mode === 'cash' ? Number(e.amount||0) : 0), 0);
+    const online = data.reduce((s, e) => s + (e.mode === 'online' ? Number(e.amount||0) : 0), 0);
+    text = `Cash: ₹${cash} | Online: ₹${online} | Total: ₹${cash + online}`;
+  } else {
+    const inc = data.reduce((s, e) => s + (e.type === 'income' ? Number(e.amount||0) : 0), 0);
+    const exp = data.reduce((s, e) => s + (e.type === 'expenses' ? Number(e.amount||0) : 0), 0);
+    text = `Income: ₹${inc} | Expenses: ₹${exp} | Balance: ₹${inc - exp}`;
+  }
+
+  el.textContent = text;
+}
+
+// ────────────────────────────────────────────────
+// DELETE WITH PASSWORD (unchanged)
+// ────────────────────────────────────────────────
+function askDelete(cat, idx) {
+  const password = prompt("Enter password to delete this entry:");
+  
+  if (password === "Shrihan") {
+    let data = getData(cat);
+    data.splice(idx, 1);
+    saveData(cat, data);
+    renderTable(cat);
+    alert("Entry deleted successfully.");
+  } else if (password !== null) {
+    alert("Incorrect password!");
+  }
+}
+
+// ────────────────────────────────────────────────
+// FIXED: REAL SCREENSHOT & EXCEL DOWNLOAD
+// ────────────────────────────────────────────────
+function captureScreenshot(tabId) {
+  const element = document.getElementById(tabId);
+  if (!element) return alert("Tab content not found");
+
+  html2canvas(element, {
+    scale: 2,                   // better quality
+    useCORS: true,
+    logging: false,
+    backgroundColor: null
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `Shivapuri_${tabId}_${formatDate().replace(/\//g,'-')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(err => {
+    console.error(err);
+    alert("Failed to capture screenshot. Try again.");
+  });
+}
+
+function exportExcel(cat) {
+  const data = getData(cat);
+  if (data.length === 0) {
+    return alert("No data available to export");
+  }
+
+  // Prepare worksheet
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  
+  // Create workbook
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, cat.charAt(0).toUpperCase() + cat.slice(1));
+
+  // Download file
+  XLSX.writeFile(workbook, `Shivapuri_${cat}_${formatDate().replace(/\//g,'-')}.xlsx`);
+}
+
+// ────────────────────────────────────────────────
+// FORM + CONFIRM + THANK YOU (unchanged)
+// ────────────────────────────────────────────────
+let pendingEntry = null;
+
+function setupForm(formId, cat) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!form.checkValidity()) return;
+
+    const entry = { date: formatDate() };
+
+    form.querySelectorAll('input, select, textarea').forEach(field => {
+      if (field.id) {
+        const key = field.id.split('-')[1];
+        entry[key] = field.type === 'number' ? Number(field.value) : field.value.trim();
+      }
+    });
+
+    pendingEntry = { cat, entry };
+
+    let msg = `<strong>Date:</strong> ${entry.date}<br>`;
+    if (cat !== 'others') {
+      msg += `<strong>Name:</strong> ${entry.name || '—'}<br>
+              <strong>Amount:</strong> ₹${entry.amount || 0}<br>
+              <strong>Mode:</strong> ${entry.mode || '—'}<br>`;
+    } else {
+      msg += `<strong>Particulars:</strong> ${entry.particulars || '—'}<br>
+              <strong>Amount:</strong> ₹${entry.amount || 0}<br>
+              <strong>Type:</strong> ${entry.type || '—'}<br>`;
+    }
+    msg += '<br><strong>Confirm this entry for Shivapuri?</strong>';
+
+    document.getElementById('confirmBody').innerHTML = msg;
+
+    bootstrap.Modal.getInstance(form.closest('.modal')).hide();
+    new bootstrap.Modal(document.getElementById('confirmModal')).show();
+
+    form.reset();
+  });
+}
+
+setupForm('indForm', 'individual');
+setupForm('aptForm', 'apartment');
+setupForm('othForm', 'others');
+
+document.getElementById('confirmSaveBtn').onclick = function() {
+  if (!pendingEntry) return;
+
+  const {cat, entry} = pendingEntry;
+  const data = getData(cat);
+  data.push(entry);
+  saveData(cat, data);
+
+  bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+
+  let thankMsg = '';
+  if (cat !== 'others') {
+    thankMsg = `To: ${entry.name || '—'}<br>Amount: ₹${entry.amount || 0}<br>Mode: ${entry.mode || '—'}`;
+  } else {
+    thankMsg = `Particulars: ${entry.particulars || '—'}<br>Amount: ₹${entry.amount || 0}<br>Type: ${entry.type || '—'}`;
+  }
+
+  document.getElementById('thankDetails').innerHTML = thankMsg;
+  new bootstrap.Modal(document.getElementById('thankModal')).show();
+
+  renderTable(cat);
+  pendingEntry = null;
+};
+
+// ────────────────────────────────────────────────
+// INIT
+// ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  ['individual','apartment','others'].forEach(cat => {
+    renderTable(cat);
+  });
+});
+</script>
+</body>
+</html>
