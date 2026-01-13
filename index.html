@@ -1,387 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shivapuri Maintenance</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg: #f2f2f7;
-      --card: rgba(255,255,255,0.85);
-      --text: #1d1d1f;
-      --accent: #007aff;
-      --danger: #ff3b30;
-      --border: rgba(0,0,0,0.08);
-      --search-bg: rgba(255,255,255,0.7);
-      --success: #34c759;
-    }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; }
-    .container { max-width: 720px; margin: 0 auto; padding: 15px; }
-    h1 { font-size: 2.2rem; font-weight: 700; text-align: center; padding: 40px 0 25px; }
-    .nav-tabs { background: var(--card); backdrop-filter: blur(24px); border-radius: 18px; border: 1px solid var(--border); padding: 6px; }
-    .nav-link { border-radius: 12px; font-weight: 600; }
-    .tab-content { background: var(--card); backdrop-filter: blur(24px); border-radius: 18px; border: 1px solid var(--border); padding: 20px; margin: 15px 0 30px; }
-    .search-container { position: relative; margin-bottom: 1.2rem; }
-    .search-input { width: 100%; padding: 12px 16px 12px 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--search-bg); backdrop-filter: blur(10px); font-size: 16px; }
-    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text); opacity: 0.6; font-size: 1.2rem; }
-    .btn-primary { background: var(--accent); border: none; border-radius: 12px; }
-    .btn-danger { background: var(--danger); border: none; border-radius: 10px; padding: 5px 10px; font-size: 0.9rem; }
-    .btn-success { background: var(--success); border: none; }
-    .table-responsive { border-radius: 12px; overflow: hidden; }
-    .table { --bs-table-bg: transparent; }
-    .table th { color: #6e6e73; font-weight: 600; border-bottom: 1px solid var(--border); }
-    .totals { background: rgba(0,122,255,0.08); border-radius: 12px; padding: 14px; margin-top: 20px; text-align: center; font-weight: 600; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Shivapuri Maintenance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { 
+            --ios-blue: #007AFF; --ios-bg: #F2F2F7; --ios-card: #FFFFFF; 
+            --ios-green: #34C759; --ios-red: #FF3B30; --ios-orange: #FF9500; --ios-purple: #5856D6;
+        }
+        body { font-family: -apple-system, system-ui, sans-serif; background-color: var(--ios-bg); margin: 0; padding: 15px; color: #1C1C1E; }
+        
+        /* Login Screen Styles */
+        #loginScreen {
+            position: fixed; inset: 0; background: var(--ios-bg); z-index: 5000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .login-card {
+            background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+        }
+        .login-card i { font-size: 50px; color: var(--ios-blue); margin-bottom: 15px; }
+        .login-card h2 { margin-bottom: 20px; font-weight: 800; }
+        .login-card input {
+            width: 100%; padding: 12px; border: 1.5px solid #E5E5EA; border-radius: 10px;
+            font-size: 18px; text-align: center; margin-bottom: 15px; outline: none; box-sizing: border-box;
+        }
 
-    .thank-you-modal .modal-content { text-align: center; padding: 2rem; }
-    .thank-you-modal .success-icon { font-size: 4.5rem; color: var(--success); margin-bottom: 1rem; }
-    .thank-you-modal .thank-title { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }
-    .thank-you-modal .thank-details { font-size: 1.2rem; margin: 0.6rem 0; }
-  </style>
+        header { text-align: center; font-size: 24px; font-weight: 800; margin-bottom: 20px; color: var(--ios-blue); text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .tab-nav { display: flex; background: #D1D1D6; border-radius: 12px; padding: 3px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; border: none; padding: 12px; border-radius: 10px; cursor: pointer; background: transparent; color: #48484A; font-weight: 700; transition: 0.3s; }
+        .tab-btn.active { background: white; color: var(--ios-blue); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+        .month-select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #E5E5EA; background: white; font-size: 16px; font-weight: 600; color: var(--ios-purple); margin-bottom: 15px; outline: none; }
+        .card { background: white; border-radius: 18px; padding: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .btn-add { background: linear-gradient(135deg, var(--ios-blue), #5AC8FA); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3); }
+        .btn-action-group { display: flex; gap: 8px; }
+        .btn-ss, .btn-xl { color: white; border: none; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+        .btn-ss { background: var(--ios-orange); } .btn-xl { background: var(--ios-green); }
+        .search-container { background: #E9E9EB; border-radius: 12px; padding: 10px 15px; display: flex; align-items: center; margin-bottom: 15px; }
+        .search-container input { background: transparent; border: none; outline: none; margin-left: 10px; width: 100%; font-size: 16px; color: #3A3A3C; }
+        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #F2F2F7; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #F8F9FA; color: #8E8E93; font-size: 12px; text-transform: uppercase; padding: 12px; border-bottom: 2px solid var(--ios-bg); }
+        td { padding: 14px 12px; border-bottom: 1px solid #F2F2F7; font-size: 14px; background: white; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .summary-card { padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
+        .card-cash { background: #E8F5E9; color: #2E7D32; }
+        .card-online { background: #E3F2FD; color: #1565C0; }
+        .card-grand { grid-column: span 2; background: linear-gradient(135deg, #5856D6, #AF52DE); color: white; }
+        .summary-card label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; opacity: 0.8; }
+        .summary-card span { font-size: 20px; font-weight: 900; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .bottom-sheet { background: white; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 30px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.3s ease-out; overflow-y: auto; max-height: 90vh; }
+        .bottom-sheet.active { transform: translateY(0); }
+        .form-item label { display: block; font-size: 12px; color: var(--ios-blue); margin-bottom: 5px; font-weight: 700; }
+        .form-item input, .form-item select, .form-item textarea { width: 100%; padding: 12px; border: 1px solid #E5E5EA; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #F9F9F9; margin-bottom: 12px; font-family: inherit; }
+        .success-screen { position: fixed; inset: 0; background: #FFF; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .success-icon { width: 120px; height: 120px; background: var(--ios-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; margin-bottom: 30px; box-shadow: 0 15px 30px rgba(52, 199, 89, 0.4); }
+        .thumb { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 2px solid #E5E5EA; }
+        .confirm-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 85%; max-width: 350px; border-radius: 20px; padding: 25px; z-index: 3000; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .confirm-box h3 { margin-top: 0; color: var(--ios-blue); }
+        .confirm-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .confirm-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-yes { flex: 1; background: var(--ios-green); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-no { flex: 1; background: #eee; color: #333; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Shivapuri Maintenance</h1>
-
-  <ul class="nav nav-tabs justify-content-center mb-3" id="myTab" role="tablist">
-    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#individual">Individual</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#apartment">Apartment</button></li>
-    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#others">Others</button></li>
-  </ul>
-
-  <div class="tab-content">
-    <!-- INDIVIDUAL -->
-    <div class="tab-pane fade show active" id="individual">
-      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#indModal">+ Add Entry</button>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" onclick="captureScreenshot('individual')">Screenshot</button>
-          <button class="btn btn-outline-success btn-sm" onclick="exportExcel('individual')">Excel</button>
-        </div>
-      </div>
-      <div class="search-container"><span class="search-icon">🔍</span><input type="text" class="search-input" id="ind-search" placeholder="Search..."></div>
-      <select class="form-select mb-3" id="ind-filter" onchange="renderTable('individual')"><option value="">All Months</option></select>
-      <div class="table-responsive"><table class="table table-hover"><thead><tr><th>#</th><th>Date</th><th>Plot</th><th>Name</th><th>Amount</th><th>Mode</th><th>Remarks</th><th></th></tr></thead><tbody id="individual-tbody"></tbody></table></div>
-      <div class="totals" id="individual-totals"></div>
+<div id="loginScreen">
+    <div class="login-card">
+        <i class="fa fa-lock"></i>
+        <h2>Admin Login</h2>
+        <input type="password" id="passInput" placeholder="Enter Password">
+        <button class="btn-add" style="width:100%;" onclick="checkPass()">Access Dashboard</button>
     </div>
-
-    <!-- APARTMENT -->
-    <div class="tab-pane fade" id="apartment">
-      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aptModal">+ Add Entry</button>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" onclick="captureScreenshot('apartment')">Screenshot</button>
-          <button class="btn btn-outline-success btn-sm" onclick="exportExcel('apartment')">Excel</button>
-        </div>
-      </div>
-      <div class="search-container"><span class="search-icon">🔍</span><input type="text" class="search-input" id="apt-search" placeholder="Search..."></div>
-      <select class="form-select mb-3" id="apt-filter" onchange="renderTable('apartment')"><option value="">All Months</option></select>
-      <div class="table-responsive"><table class="table table-hover"><thead><tr><th>#</th><th>Date</th><th>Plot</th><th>Flat</th><th>Name</th><th>Amount</th><th>Mode</th><th>Remarks</th><th></th></tr></thead><tbody id="apartment-tbody"></tbody></table></div>
-      <div class="totals" id="apartment-totals"></div>
-    </div>
-
-    <!-- OTHERS -->
-    <div class="tab-pane fade" id="others">
-      <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#othModal">+ Add Entry</button>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary btn-sm" onclick="captureScreenshot('others')">Screenshot</button>
-          <button class="btn btn-outline-success btn-sm" onclick="exportExcel('others')">Excel</button>
-        </div>
-      </div>
-      <div class="search-container"><span class="search-icon">🔍</span><input type="text" class="search-input" id="oth-search" placeholder="Search..."></div>
-      <select class="form-select mb-3" id="oth-filter" onchange="renderTable('others')"><option value="">All Months</option></select>
-      <div class="table-responsive"><table class="table table-hover"><thead><tr><th>#</th><th>Date</th><th>Particulars</th><th>Qty</th><th>Amount</th><th>Type</th><th>Remarks</th><th></th></tr></thead><tbody id="others-tbody"></tbody></table></div>
-      <div class="totals" id="others-totals"></div>
-    </div>
-  </div>
 </div>
 
-<!-- Modals (unchanged) -->
-<div class="modal fade" id="indModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5>New Individual Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-  <div class="modal-body">
-    <form id="indForm">
-      <div class="mb-3"><label>Plot Number</label><input type="number" class="form-control" id="i-plot" required></div>
-      <div class="mb-3"><label>Name</label><input type="text" class="form-control" id="i-name" required></div>
-      <div class="mb-3"><label>Amount</label><input type="number" class="form-control" id="i-amount" required min="1"></div>
-      <div class="mb-3"><label>Payment Mode</label><select class="form-select" id="i-mode" required><option value="cash">Cash</option><option value="online">Online</option></select></div>
-      <div class="mb-3"><label>Remarks</label><textarea class="form-control" id="i-remarks"></textarea></div>
-      <button type="submit" class="btn btn-primary w-100">Save</button>
-    </form>
-  </div>
-</div></div></div>
+<header>Shivapuri Maintenance</header>
 
-<div class="modal fade" id="aptModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5>New Apartment Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-  <div class="modal-body">
-    <form id="aptForm">
-      <div class="mb-3"><label>Plot Number</label><input type="number" class="form-control" id="a-plot" required></div>
-      <div class="mb-3"><label>Flat Number</label><input type="number" class="form-control" id="a-flat" required></div>
-      <div class="mb-3"><label>Name</label><input type="text" class="form-control" id="a-name" required></div>
-      <div class="mb-3"><label>Amount</label><input type="number" class="form-control" id="a-amount" required min="1"></div>
-      <div class="mb-3"><label>Payment Mode</label><select class="form-select" id="a-mode" required><option value="cash">Cash</option><option value="online">Online</option></select></div>
-      <div class="mb-3"><label>Remarks</label><textarea class="form-control" id="a-remarks"></textarea></div>
-      <button type="submit" class="btn btn-primary w-100">Save</button>
-    </form>
-  </div>
-</div></div></div>
-
-<div class="modal fade" id="othModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-  <div class="modal-header"><h5>New Others Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-  <div class="modal-body">
-    <form id="othForm">
-      <div class="mb-3"><label>Particulars</label><input type="text" class="form-control" id="o-particulars" required></div>
-      <div class="mb-3"><label>Quantity</label><input type="number" class="form-control" id="o-qty" required></div>
-      <div class="mb-3"><label>Amount</label><input type="number" class="form-control" id="o-amount" required min="1"></div>
-      <div class="mb-3"><label>Type</label><select class="form-select" id="o-type" required><option value="income">Income</option><option value="expenses">Expenses</option></select></div>
-      <div class="mb-3"><label>Remarks</label><textarea class="form-control" id="o-remarks"></textarea></div>
-      <button type="submit" class="btn btn-primary w-100">Save</button>
-    </form>
-  </div>
-</div></div></div>
-
-<!-- Confirmation & Thank You Modals (unchanged) -->
-<div class="modal fade" id="confirmModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white"><h5 class="modal-title">Shivapuri Confirmation</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body" id="confirmBody"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" id="confirmSaveBtn">Confirm</button>
-      </div>
-    </div>
-  </div>
+<div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('Individual')">Individual</button>
+    <button class="tab-btn" onclick="switchTab('Apartment')">Apartment</button>
+    <button class="tab-btn" onclick="switchTab('Others')">Others</button>
 </div>
 
-<div class="modal fade thank-you-modal" id="thankModal" tabindex="-1" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div class="success-icon">✓</div>
-        <div class="thank-title">Payment Successful!</div>
-        <div class="thank-details" id="thankDetails"></div>
-        <div class="thank-details mt-3" style="color:var(--success);font-weight:bold;">Received for Shivapuri Maintenance</div>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Done</button>
-      </div>
+<select id="monthFilter" class="month-select" onchange="renderTable()">
+    <option value="all">📅 Show All Months</option>
+    <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option><option value="04">Apr</option>
+    <option value="05">May</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Aug</option>
+    <option value="09">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+</select>
+
+<div class="card">
+    <div class="controls">
+        <button class="btn-add" onclick="openForm()">+ Add New Record</button>
+        <div class="btn-action-group">
+            <button class="btn-ss" onclick="takeScreenshot()"><i class="fa fa-camera"></i></button>
+            <button class="btn-xl" onclick="downloadExcel()"><i class="fa fa-file-excel"></i></button>
+        </div>
     </div>
-  </div>
+    <div class="search-container">
+        <i class="fa fa-search" style="color:#8E8E93"></i>
+        <input type="text" id="searchInput" placeholder="Search name or plot..." oninput="renderTable()">
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr id="tableHeaders"></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+    <div class="summary-grid">
+        <div class="summary-card card-cash"><label id="lbl1">Cash</label><span id="sumCash">₹0</span></div>
+        <div class="summary-card card-online"><label id="lbl2">Online</label><span id="sumOnline">₹0</span></div>
+        <div class="summary-card card-grand"><label id="lbl3">Grand Total</label><span id="sumGrand">₹0</span></div>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<div id="formOverlay" class="overlay" onclick="closeForm(event)"><div class="bottom-sheet" id="sheetContent" onclick="event.stopPropagation()"></div></div>
+
+<div id="confirmOverlay" class="overlay" style="z-index: 2900;">
+    <div class="confirm-box" id="confirmBox">
+        <h3>Check & Confirm Details in Your UPI App to Whom You'r Paying</h3>
+        <div id="confirmDetails"></div>
+        <div class="confirm-btns">
+            <button class="btn-no" onclick="document.getElementById('confirmOverlay').style.display='none'">Edit</button>
+            <button class="btn-yes" onclick="finalSave()">Yes, Submit</button>
+        </div>
+    </div>
+</div>
+
+<div id="successScreen" class="success-screen">
+    <div class="success-icon"><i class="fa fa-check"></i></div><h1>Success!</h1><p>Synced to Cloud.</p>
+    <button class="btn-add" style="width: 220px; padding: 18px;" onclick="closeSuccess()">Back</button>
+</div>
 
 <script>
-// ────────────────────────────────────────────────
-// STORAGE & UTILITIES (unchanged)
-// ────────────────────────────────────────────────
-const STORAGE = {
-  individual: 'shivapuri_individual',
-  apartment: 'shivapuri_apartment',
-  others: 'shivapuri_others'
-};
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxBN_ZSqSBQY7Jnb0zJ06fHa38NAg07eFbgHE37KF_1APY4xhiHODhapy_aNI2XqDz/exec"; 
+    let db = JSON.parse(localStorage.getItem('shivapuri_db')) || { Individual: [], Apartment: [], Others: [] };
+    let activeTab = 'Individual';
+    let currentPhoto = null;
+    let tempFormData = {};
 
-function getData(cat) { return JSON.parse(localStorage.getItem(STORAGE[cat]) || '[]'); }
-function saveData(cat, data) { localStorage.setItem(STORAGE[cat], JSON.stringify(data)); }
-function formatDate() { return new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'2-digit', year:'numeric'}); }
-
-// ────────────────────────────────────────────────
-// RENDER & TOTALS (unchanged)
-// ────────────────────────────────────────────────
-function renderTable(cat) {
-  const data = getData(cat);
-  const tbody = document.getElementById(cat + '-tbody');
-  tbody.innerHTML = '';
-
-  data.forEach((item, i) => {
-    const tr = document.createElement('tr');
-    let html = `<td>${i+1}</td><td>${item.date}</td>`;
-
-    if (cat === 'individual') {
-      html += `<td>${item.plot || '-'}</td><td>${item.name || '-'}</td>`;
-    } else if (cat === 'apartment') {
-      html += `<td>${item.plot || '-'}</td><td>${item.flat || '-'}</td><td>${item.name || '-'}</td>`;
-    } else {
-      html += `<td>${item.particulars || '-'}</td><td>${item.qty || '-'}</td>`;
+    function checkPass() {
+        const p = document.getElementById('passInput').value;
+        if(p === "Shrihan") {
+            document.getElementById('loginScreen').style.display = 'none';
+        } else {
+            alert("Incorrect Password!");
+        }
     }
 
-    html += `<td>₹${item.amount || 0}</td>`;
+    function switchTab(type) { activeTab = type; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText === type)); renderTable(); }
 
-    if (cat === 'others') {
-      html += `<td>${item.type || '-'}</td>`;
-    } else {
-      html += `<td>${item.mode || '-'}</td>`;
+    function openForm() {
+        const today = new Date().toISOString().split('T')[0];
+        let fields = `<div class="form-item"><label>Date</label><input type="date" id="f_date" value="${today}"></div>`;
+        if (activeTab === 'Others') {
+            fields += `<div class="form-item"><label>Particulars</label><input type="text" id="f_particulars" placeholder="e.g. Tanker Water"></div>
+                <div class="form-item"><label>Qty</label><input type="number" id="f_qty" value="1" oninput="calcTotal()" placeholder="1"></div>
+                <div class="form-item"><label>Amount (per unit)</label><input type="number" id="f_unit_amt" oninput="calcTotal()" placeholder="₹ 0"></div>
+                <div class="form-item"><label>Total Amount</label><input type="number" id="f_amount" readonly placeholder="Total"></div>
+                <div class="form-item"><label>Type</label><select id="f_category"><option value="Income">Income</option><option value="Expense">Expense</option></select></div>`;
+        } else {
+            fields += `<div class="form-item"><label>Plot Number</label><input type="number" id="f_plot" placeholder="e.g. 15"></div>
+                ${activeTab === 'Apartment' ? `<div class="form-item"><label>Flat No.</label><input type="number" id="f_flat" placeholder="e.g. 101"></div>` : ''}
+                <div class="form-item"><label>Name</label><input type="text" id="f_name" placeholder="Enter Full Name"></div>
+                <div class="form-item"><label>Amount</label><input type="number" id="f_amount" oninput="updateQR()" placeholder="₹ 0"></div>`;
+        }
+        fields += `<div class="form-item"><label>Payment Mode</label><select id="f_mode" onchange="toggleQR(this.value)"><option value="Cash">Cash</option><option value="Online">Online</option></select></div>
+            <div id="qrBox" style="text-align:center; display:none; padding:15px; background: white; border: 1px solid #ddd; border-radius:15px; margin-bottom:15px;">
+                <p style="font-size:11px; color:#666;">UPI: shivapuriwelfareassociation@sbi</p>
+                <img id="qrImg" src="" width="160">
+                <p id="qrLabel" style="font-weight:bold; color:var(--ios-green); margin-top:5px;"></p>
+            </div>
+            <div class="form-item"><label>Remarks</label><textarea id="f_remarks" placeholder="Notes..."></textarea></div>
+            <div class="form-item"><label>Proof</label><input type="file" accept="image/*" onchange="handleFile(this)"></div>
+            <button class="btn-add" style="width: 100%; padding:16px;" onclick="showConfirmation()">Confirm & Save</button>`;
+        document.getElementById('sheetContent').innerHTML = fields;
+        document.getElementById('formOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('sheetContent').classList.add('active'), 10);
     }
 
-    html += `<td>${item.remarks || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="askDelete('${cat}', ${i})">×</button></td>`;
-
-    tr.innerHTML = html;
-    tbody.appendChild(tr);
-  });
-
-  updateTotals(cat, data);
-}
-
-function updateTotals(cat, data) {
-  const el = document.getElementById(cat + '-totals');
-  let text = 'Total: ₹0';
-
-  if (cat === 'individual' || cat === 'apartment') {
-    const cash = data.reduce((s, e) => s + (e.mode === 'cash' ? Number(e.amount||0) : 0), 0);
-    const online = data.reduce((s, e) => s + (e.mode === 'online' ? Number(e.amount||0) : 0), 0);
-    text = `Cash: ₹${cash} | Online: ₹${online} | Total: ₹${cash + online}`;
-  } else {
-    const inc = data.reduce((s, e) => s + (e.type === 'income' ? Number(e.amount||0) : 0), 0);
-    const exp = data.reduce((s, e) => s + (e.type === 'expenses' ? Number(e.amount||0) : 0), 0);
-    text = `Income: ₹${inc} | Expenses: ₹${exp} | Balance: ₹${inc - exp}`;
-  }
-
-  el.textContent = text;
-}
-
-// ────────────────────────────────────────────────
-// DELETE WITH PASSWORD (unchanged)
-// ────────────────────────────────────────────────
-function askDelete(cat, idx) {
-  const password = prompt("Enter password to delete this entry:");
-  
-  if (password === "Shrihan") {
-    let data = getData(cat);
-    data.splice(idx, 1);
-    saveData(cat, data);
-    renderTable(cat);
-    alert("Entry deleted successfully.");
-  } else if (password !== null) {
-    alert("Incorrect password!");
-  }
-}
-
-// ────────────────────────────────────────────────
-// FIXED: REAL SCREENSHOT & EXCEL DOWNLOAD
-// ────────────────────────────────────────────────
-function captureScreenshot(tabId) {
-  const element = document.getElementById(tabId);
-  if (!element) return alert("Tab content not found");
-
-  html2canvas(element, {
-    scale: 2,                   // better quality
-    useCORS: true,
-    logging: false,
-    backgroundColor: null
-  }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `Shivapuri_${tabId}_${formatDate().replace(/\//g,'-')}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }).catch(err => {
-    console.error(err);
-    alert("Failed to capture screenshot. Try again.");
-  });
-}
-
-function exportExcel(cat) {
-  const data = getData(cat);
-  if (data.length === 0) {
-    return alert("No data available to export");
-  }
-
-  // Prepare worksheet
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  
-  // Create workbook
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, cat.charAt(0).toUpperCase() + cat.slice(1));
-
-  // Download file
-  XLSX.writeFile(workbook, `Shivapuri_${cat}_${formatDate().replace(/\//g,'-')}.xlsx`);
-}
-
-// ────────────────────────────────────────────────
-// FORM + CONFIRM + THANK YOU (unchanged)
-// ────────────────────────────────────────────────
-let pendingEntry = null;
-
-function setupForm(formId, cat) {
-  const form = document.getElementById(formId);
-  if (!form) return;
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    if (!form.checkValidity()) return;
-
-    const entry = { date: formatDate() };
-
-    form.querySelectorAll('input, select, textarea').forEach(field => {
-      if (field.id) {
-        const key = field.id.split('-')[1];
-        entry[key] = field.type === 'number' ? Number(field.value) : field.value.trim();
-      }
-    });
-
-    pendingEntry = { cat, entry };
-
-    let msg = `<strong>Date:</strong> ${entry.date}<br>`;
-    if (cat !== 'others') {
-      msg += `<strong>Name:</strong> ${entry.name || '—'}<br>
-              <strong>Amount:</strong> ₹${entry.amount || 0}<br>
-              <strong>Mode:</strong> ${entry.mode || '—'}<br>`;
-    } else {
-      msg += `<strong>Particulars:</strong> ${entry.particulars || '—'}<br>
-              <strong>Amount:</strong> ₹${entry.amount || 0}<br>
-              <strong>Type:</strong> ${entry.type || '—'}<br>`;
+    function calcTotal() { 
+        const q = document.getElementById('f_qty').value || 0; 
+        const u = document.getElementById('f_unit_amt').value || 0; 
+        document.getElementById('f_amount').value = q * u;
+        updateQR();
     }
-    msg += '<br><strong>Confirm this entry for Shivapuri?</strong>';
 
-    document.getElementById('confirmBody').innerHTML = msg;
+    function updateQR() {
+        const amt = document.getElementById('f_amount').value || 0;
+        const img = document.getElementById('qrImg');
+        const label = document.getElementById('qrLabel');
+        if (amt > 0) {
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shivapuriwelfareassociation@sbi%26pn=Shivapuri%26am=${amt}%26cu=INR`;
+            label.innerText = `Pay ₹${amt}`;
+        }
+    }
 
-    bootstrap.Modal.getInstance(form.closest('.modal')).hide();
-    new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    function toggleQR(v) { document.getElementById('qrBox').style.display = v === 'Online' ? 'block' : 'none'; updateQR(); }
+    function closeForm(e) { if (!e || e.target.id === 'formOverlay') { document.getElementById('sheetContent').classList.remove('active'); setTimeout(() => document.getElementById('formOverlay').style.display = 'none', 300); } }
+    function handleFile(i) { if (i.files[0]) { const r = new FileReader(); r.onload = (e) => currentPhoto = e.target.result; r.readAsDataURL(i.files[0]); } }
 
-    form.reset();
-  });
-}
+    function showConfirmation() {
+        const id = Date.now();
+        tempFormData = { id: id, date: document.getElementById('f_date').value, amount: document.getElementById('f_amount').value, mode: document.getElementById('f_mode').value, remarks: document.getElementById('f_remarks').value || '-', photo: currentPhoto, tab: activeTab };
+        let detailHtml = `<div class="confirm-row"><span>Date:</span><b>${tempFormData.date}</b></div>`;
+        if (activeTab === 'Others') {
+            tempFormData.name = document.getElementById('f_particulars').value;
+            tempFormData.qty = document.getElementById('f_qty').value;
+            tempFormData.category = document.getElementById('f_category').value;
+            tempFormData.plot = ""; tempFormData.flat = ""; 
+            detailHtml += `<div class="confirm-row"><span>Item:</span><b>${tempFormData.name}</b></div><div class="confirm-row"><span>Type:</span><b>${tempFormData.category}</b></div>`;
+        } else {
+            tempFormData.name = document.getElementById('f_name').value;
+            tempFormData.plot = document.getElementById('f_plot').value;
+            tempFormData.flat = (activeTab === 'Apartment') ? document.getElementById('f_flat').value : ""; 
+            detailHtml += `<div class="confirm-row"><span>Plot:</span><b>${tempFormData.plot}</b></div>`;
+            if(activeTab === 'Apartment') detailHtml += `<div class="confirm-row"><span>Flat:</span><b>${tempFormData.flat}</b></div>`;
+            detailHtml += `<div class="confirm-row"><span>Name:</span><b>${tempFormData.name}</b></div>`;
+        }
+        detailHtml += `<div class="confirm-row"><span>Amount:</span><b style="color:green">₹${tempFormData.amount}</b></div>`;
+        document.getElementById('confirmDetails').innerHTML = detailHtml;
+        document.getElementById('confirmOverlay').style.display = 'flex';
+        document.getElementById('confirmBox').style.display = 'block';
+    }
 
-setupForm('indForm', 'individual');
-setupForm('aptForm', 'apartment');
-setupForm('othForm', 'others');
+    async function finalSave() {
+        document.getElementById('confirmOverlay').style.display = 'none';
+        fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(tempFormData) });
+        db[activeTab].unshift(tempFormData);
+        localStorage.setItem('shivapuri_db', JSON.stringify(db));
+        document.getElementById('formOverlay').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'flex';
+        renderTable();
+    }
 
-document.getElementById('confirmSaveBtn').onclick = function() {
-  if (!pendingEntry) return;
+    function renderTable() {
+        const m = document.getElementById('monthFilter').value;
+        const s = document.getElementById('searchInput').value.toLowerCase();
+        let list = db[activeTab].filter(i => {
+            const mMatch = (m === 'all' || i.date.split('-')[1] === m);
+            const sMatch = (i.name || "").toLowerCase().includes(s) || (i.plot || "").toString().includes(s);
+            return mMatch && sMatch;
+        });
 
-  const {cat, entry} = pendingEntry;
-  const data = getData(cat);
-  data.push(entry);
-  saveData(cat, data);
+        let h = activeTab === 'Others' ? `<th>Date</th><th>Item</th><th>Qty</th><th>Total</th><th>Type</th><th>Proof</th><th></th>` : 
+                                       `<th>Date</th><th>Plot</th>${activeTab === 'Apartment' ? '<th>Flat</th>' : ''}<th>Name</th><th>Amount</th><th>Proof</th><th></th>`;
+        document.getElementById('tableHeaders').innerHTML = h;
 
-  bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+        document.getElementById('tableBody').innerHTML = list.map(i => `
+            <tr><td>${i.date}</td>${activeTab === 'Others' ? `<td>${i.name}</td><td>${i.qty}</td>` : `<td>${i.plot}</td>${activeTab === 'Apartment' ? `<td>${i.flat}</td>` : ''}<td>${i.name}</td>`}
+                <td style="color:${i.category === 'Expense' ? 'red' : 'green'}; font-weight:700;">₹${i.amount}</td>
+                ${activeTab === 'Others' ? `<td>${i.category}</td>` : ''}
+                <td>${i.photo ? `<img src="${i.photo}" class="thumb" onclick="window.open().document.write('<img src=${i.photo} style=width:100%>')">` : '-'}</td>
+                <td><button onclick="deleteEntry('${i.id}')" style="color:red; border:none; background:none; cursor:pointer;"><i class="fa fa-trash"></i></button></td></tr>`).join('');
+        updateSummary(list);
+    }
 
-  let thankMsg = '';
-  if (cat !== 'others') {
-    thankMsg = `To: ${entry.name || '—'}<br>Amount: ₹${entry.amount || 0}<br>Mode: ${entry.mode || '—'}`;
-  } else {
-    thankMsg = `Particulars: ${entry.particulars || '—'}<br>Amount: ₹${entry.amount || 0}<br>Type: ${entry.type || '—'}`;
-  }
+    function updateSummary(list) {
+        let c1 = 0, c2 = 0;
+        list.forEach(i => {
+            const v = parseFloat(i.amount || 0);
+            if (activeTab === 'Others') { if (i.category === 'Income') c1 += v; else c2 += v; }
+            else { if (i.mode === 'Cash') c1 += v; else c2 += v; }
+        });
+        if (activeTab === 'Others') {
+            document.getElementById('lbl1').innerText = "Income"; document.getElementById('lbl2').innerText = "Expense"; document.getElementById('lbl3').innerText = "Balance";
+            document.getElementById('sumGrand').innerText = '₹' + (c1 - c2).toFixed(2);
+        } else {
+            document.getElementById('lbl1').innerText = "Cash"; document.getElementById('lbl2').innerText = "Online"; document.getElementById('lbl3').innerText = "Total";
+            document.getElementById('sumGrand').innerText = '₹' + (c1 + c2).toFixed(2);
+        }
+        document.getElementById('sumCash').innerText = '₹' + c1.toFixed(2);
+        document.getElementById('sumOnline').innerText = '₹' + c2.toFixed(2);
+    }
 
-  document.getElementById('thankDetails').innerHTML = thankMsg;
-  new bootstrap.Modal(document.getElementById('thankModal')).show();
+    function deleteEntry(id) {
+        if (prompt("Enter Password to Delete:") === "Shrihan") {
+            fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "delete", id: id, tab: activeTab }) });
+            db[activeTab] = db[activeTab].filter(i => i.id != id);
+            localStorage.setItem('shivapuri_db', JSON.stringify(db));
+            renderTable();
+        }
+    }
 
-  renderTable(cat);
-  pendingEntry = null;
-};
+    function downloadExcel() {
+        const m = document.getElementById('monthFilter').value;
+        const s = document.getElementById('searchInput').value.toLowerCase();
+        let filteredData = db[activeTab].filter(i => {
+            const mMatch = (m === 'all' || i.date.split('-')[1] === m);
+            const sMatch = (i.name || "").toLowerCase().includes(s) || (i.plot || "").toString().includes(s);
+            return mMatch && sMatch;
+        });
+        const excelData = filteredData.map(i => {
+            if (activeTab === 'Others') return { "Date": i.date, "Item": i.name, "Qty": i.qty, "Total Amount": i.amount, "Type": i.category, "Remarks": i.remarks };
+            let row = { "Date": i.date, "Plot": i.plot };
+            if (activeTab === 'Apartment') row["Flat"] = i.flat;
+            row["Name"] = i.name; row["Amount"] = i.amount; row["Payment Mode"] = i.mode; row["Remarks"] = i.remarks;
+            return row;
+        });
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, activeTab);
+        XLSX.writeFile(wb, `Shivapuri_${activeTab}_Report.xlsx`);
+    }
 
-// ────────────────────────────────────────────────
-// INIT
-// ────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  ['individual','apartment','others'].forEach(cat => {
-    renderTable(cat);
-  });
-});
+    function takeScreenshot() { html2canvas(document.body).then(c => { const l = document.createElement('a'); l.download = 'Report.png'; l.href = c.toDataURL(); l.click(); }); }
+    function closeSuccess() { document.getElementById('successScreen').style.display = 'none'; currentPhoto = null; }
+    window.onload = renderTable;
 </script>
 </body>
 </html>
