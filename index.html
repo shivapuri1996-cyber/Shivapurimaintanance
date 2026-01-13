@@ -198,7 +198,7 @@
         const img = document.getElementById('qrImg');
         const label = document.getElementById('qrLabel');
         if (amt > 0) {
-            img.src = Shivapuri QR.jpegupi://pay?pa=shivapuriwelfareassociation@sbi%26pn=Shivapuri%26am=${amt}%26cu=INR`;
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shivapuriwelfareassociation@sbi%26pn=Shivapuri%26am=${amt}%26cu=INR`;
             label.innerText = `Pay ₹${amt}`;
         }
     }
@@ -317,4 +317,3 @@
 </script>
 </body>
 </html>
-
